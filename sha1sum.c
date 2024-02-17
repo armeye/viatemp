@@ -56,16 +56,16 @@ void main(int argc, char **argv)
 	state[3] = 0x10325476;
 	state[4] = 0xc3d2e1f0;
 
-	v = segattach(0, "memory", (void *)0xde000000, 4096);
+	v = segattach(0, "memory", (void *)0xde000000, IOUNIT);
 
 	fmtinstall('M', digestfmt);
 
 	fd = open(argv[1], OREAD);
 
-	while((n = read(fd, v, 4096-64)) > 0){
-		if(n == 4096-64){
+	while((n = read(fd, v, ShaBufSZ)) > 0){
+		if(n == ShaBufSZ){
 			atnotify(handlefault, 1);
-			viasha(v, 4096, state);
+			viasha(v, IOUNIT, state);
 			atnotify(handlefault, 0);
 			total+=n;
 		}
@@ -73,14 +73,14 @@ void main(int argc, char **argv)
 			break;
 	}
 
-	s = 4032 - n;
+	s = ShaBufSZ - n;
 	
 	total+=n;
 	l = total & 63;
 	total*=8;
 	pl = (l < 56) ? (56 - l) : (120 - l);
 
-	s = 4032 - (n+pl+8);
+	s = ShaBufSZ - (n+pl+8);
 
 	memmove(v+s, v, n);
 	memmove(v+s+n, pad, pl);
