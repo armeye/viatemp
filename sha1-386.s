@@ -1,6 +1,6 @@
 /*
 * void viasha(uchar *buf, uint count, *uint sum)
-/*
+*/
 TEXT viasha(SB), $0
 	MOVL $0, AX
 	MOVL buf+0(FP), SI
